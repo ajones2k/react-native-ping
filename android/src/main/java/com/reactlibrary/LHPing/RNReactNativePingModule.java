@@ -12,8 +12,11 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+
 public class RNReactNativePingModule extends ReactContextBaseJavaModule {
     private final String TIMEOUT_KEY = "timeout";
+    private final String TTL_KEY =  "ttl";
+    private final String COUNT_KEY = "count";
     private final ReactApplicationContext reactContext;
     HandlerThread handlerThread = new HandlerThread("HandlerThread");
 
@@ -37,6 +40,18 @@ public class RNReactNativePingModule extends ReactContextBaseJavaModule {
             timeout = option.getInt(TIMEOUT_KEY);
         }
         final int finalTimeout = timeout;
+
+        int ttl = 25;
+        if (option.hasKey(TTL_KEY)) {
+            ttl = option.getInt(TTL_KEY);
+        }
+        final int finalTtl = ttl;
+
+        int count = 1;
+        if (option.hasKey(COUNT_KEY)) {
+            count = option.getInt(COUNT_KEY);
+        }
+        final int finalCount = count;
 
         Handler mHandler = new Handler(handlerThread.getLooper());
         mHandler.post(new Runnable() {
