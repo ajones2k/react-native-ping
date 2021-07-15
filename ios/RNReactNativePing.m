@@ -37,8 +37,13 @@ RCT_EXPORT_METHOD(
         ping.timeout = timeout;
     }
     
-
-    [ping setupWithBlock:^(BOOL success, NSError *_Nullable err) {
+    NSNumber *nsTtl = option[@"ttl"];
+    if( nsTtl ) {
+        ping.ttl = nsTtl.intValue;
+        NSLog(@"ttl param = %@",nsTtl);
+    }
+    
+    [ping setupWithBlock:^(BOOL success, NSError *_Nullable err)  {
         if (!success) {
             reject(@(err.code).stringValue,err.domain,err);
             return;
@@ -47,7 +52,16 @@ RCT_EXPORT_METHOD(
             if (!ping) {
                 return;
             }
-            resolve(@(@(summary.rtt * 1000).intValue));
+            NSString *rtt = [NSString stringWithFormat:@"%d",@(summary.rtt * 1000).intValue];
+            NSString *ttl = [NSString stringWithFormat:@"%lu",summary.ttl];
+            NSString *fromAddr = summary.host;
+            NSString *matchAddr = [NSString stringWithFormat:@"%lu",summary.matchesAddress];
+            resolve(@{
+                @"rtt": rtt,
+                @"ttl": ttl,
+                @"fromAddr": fromAddr,
+                @"matchesAddress": matchAddr
+            });
             [ping stop];
             ping = nil;
         } fail:^(NSError *_Nonnull error) {
@@ -58,7 +72,7 @@ RCT_EXPORT_METHOD(
             [ping stop];
             ping = nil;
         }];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_MSEC)), _queue, ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_MSEC)), self->_queue, ^{
             if (!ping) {
                 return;
             }

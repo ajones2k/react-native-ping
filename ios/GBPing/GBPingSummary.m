@@ -35,6 +35,7 @@
     copy.sendDate = [self.sendDate copy];
     copy.receiveDate = [self.receiveDate copy];
     copy.status = self.status;
+    copy.matchesAddress = self.matchesAddress;
     
     return copy;
 }

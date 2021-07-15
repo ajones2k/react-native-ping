@@ -61,8 +61,9 @@ public class RNReactNativePingModule extends ReactContextBaseJavaModule {
                     if (isFinish[0]) {
                         return;//Prevent multiple calls
                     }
-                    int rtt = PingUtil.getAvgRTT(ipAddress, 1, finalTimeout);
-                    promise.resolve(Integer.valueOf(rtt));
+                    //String cmd = "/system/bin/ping -c 1 -W " + finalTimeout + " -t " + finalTtl + " " + ipAddress;
+                    WritableMap map = PingUtil.getAvgRTT(ipAddress, finalCount, finalTimeout, finalTtl );
+                    promise.resolve(map);                    
                     isFinish[0] = true;
                 } catch (Exception e) {
                     if (isFinish[0]) {//Prevent multiple calls

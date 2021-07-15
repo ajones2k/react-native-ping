@@ -20,5 +20,6 @@ typedef enum {
 @property (strong, nonatomic, nullable) NSDate *receiveDate;
 @property (assign, nonatomic) NSTimeInterval rtt;
 @property (assign, nonatomic) GBPingStatus status;
+@property (assign, nonatomic) NSUInteger matchesAddress;
 
 @end
