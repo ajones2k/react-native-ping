@@ -322,6 +322,28 @@ public class PingUtil {
         }
         return "";
     }
+
+    private static String [] getStats(String respPing) {
+        Pattern p = Pattern.compile("[0-9]+[.][0-9]+/[0-9]+[.][0-9]+/[0-9]+[.][0-9]+/[0-9]+[.][0-9]+");
+        Matcher m = p.matcher(respPing);
+        if (m.find()) {
+            String stats = m.group(0);
+            String[] ret = stats.split( "/");
+            return ret;
+        }
+        return new String[]{"no-stats"};
+    }
+
+    private static String getLoss(String respPing) {
+        Pattern p = Pattern.compile("[0-9]+% packet");
+        Matcher m = p.matcher(respPing);
+        if (m.find()) {
+            String tmp = m.group(0);
+            String[] parts = tmp.split("%");
+            return parts[0];
+        }
+        return "unk";
+    }
     
     private static WritableMap pingNf(String command) {
         Process process = null;
@@ -357,6 +379,8 @@ public class PingUtil {
             String respErr = eb.toString();
             String rtt = getRtt(respPing);
             String ipAddr = getIP(respPing);
+            String[] stats = getStats(respPing);
+            String loss = getLoss(respPing);
             boolean ttlEx = getTtlEx(respPing);
             boolean unkHost = getUnkHost(respErr);
             String orgRtt = rtt;
@@ -381,7 +405,7 @@ public class PingUtil {
                     matchesAddress = "1";
                 }
             }
-            map.putString("respPing", respPing);
+            //map.putString("respPing", respPing);
             map.putString("respErr", respErr);
             map.putString("rtt", rtt);
             map.putString("fromAddr", getFromIp(respPing));
@@ -389,6 +413,14 @@ public class PingUtil {
             map.putString("matchesAddress", matchesAddress);
             map.putString("orgTtl", orgRtt);
             map.putString("ipAddr", ipAddr);
+            if( stats.length == 4 ) {
+                map.putString("min",stats[0]);
+                map.putString("avg",stats[1]);
+                map.putString("max",stats[2]);
+                map.putString("dev",stats[3]);
+            }
+            map.putString("loss",loss);
+            map.putString("connand",command);
             return map;
         } catch (IOException e) {
             e.printStackTrace();
