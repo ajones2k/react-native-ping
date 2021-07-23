@@ -35,9 +35,14 @@ public class RNReactNativePingModule extends ReactContextBaseJavaModule {
         }
 
         final boolean[] isFinish = {false};
-        int timeout = 1000;
+        int timeout = 5;
         if (option.hasKey(TIMEOUT_KEY)) {
             timeout = option.getInt(TIMEOUT_KEY);
+            //typically W timeout flag is in milliseconds, however it appear to be in seconds for AOS
+            timeout = (int)(timeout / 1000);
+            if( timeout == 0 ) {
+                timeout = 1;
+            }
         }
         final int finalTimeout = timeout;
 
